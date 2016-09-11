@@ -3,6 +3,126 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
 var $ = require('jquery');
+var marked = require('marked');
+
+marked.setOptions({
+  renderer: new marked.Renderer(),
+  gfm: true,
+  tables: true,
+  breaks: true,
+});
+
+var GijiHolic = React.createClass({
+  getInitialState: function() {
+    return {data: []};
+  },
+
+  componentWillMount: function() {
+    var initialVal = '# GIJIHolic\n\nis markdown editor';
+    if (localStorage.getItem('giji') === null) {
+      localStorage.setItem('giji', JSON.stringify({text: initialVal}));
+    }
+  },
+
+  componentDidMount: function() {
+    this.setState({
+      data: this.fetchLocal().data
+    });
+  },
+
+  componentDidUpdate: function(prevProps, prevState) {
+    this.saveLocal();
+  },
+
+  handleGijiChange: function(e) {
+    this.setState({
+      data: {text: e.target.value}
+    });
+  },
+
+  saveLocal: function() {
+    localStorage.setItem('giji', JSON.stringify(this.state));
+  },
+
+  fetchLocal: function() {
+    return JSON.parse(localStorage.getItem('giji'));
+  },
+
+  render: function() {
+    return (
+      <div className="app">
+        <Header />
+        <div className="gijiholic-wrapper">
+          <div className="gijiholic">
+            <div className="editor-wrapper">
+              <GijiEditor
+                text={this.state.data.text}
+                onChange={this.handleGijiChange}
+              />
+            </div>
+            <div className="preview-wrapper">
+              <GijiPreview
+                text={this.state.data.text}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+});
+
+var Header = React.createClass({
+  render: function() {
+    return (
+      <header className="g-header">
+        <h1>
+          <a href="./">GIJIHolic</a>
+        </h1>
+      </header>
+    );
+  }
+});
+
+var GijiEditor = React.createClass({
+  getInitialState: function() {
+    return {text: ''};
+  },
+
+  componentDidMount: function() {
+    this.refs.textarea.getDOMNode().focus();
+  },
+
+  _onChange(e) {
+    this.props.onChange(e);
+  },
+
+  render: function() {
+    return (
+      <textarea
+        ref="textarea"
+        value={this.props.text}
+        onChange={this._onChange}
+      />
+    );
+  }
+});
+
+var GijiPreview = React.createClass({
+  getDefaultProps() {
+    return {
+      text: ''
+    };
+  },
+
+  render: function() {
+    var markedText = marked(this.props.text);
+    return (
+      <div className="preview-content" dangerouslySetInnerHTML={{__html: markedText}}>
+      </div>
+    );
+  }
+});
 
 var CommentBox = React.createClass({
   loadCommentsFromServer: function() {
@@ -20,7 +140,7 @@ var CommentBox = React.createClass({
   },
   handleCommentSubmit: function(comment) {
     $.ajax({
-      url: this.props.url + 'insert/' + comment.createdOn,
+      url: this.props.url + 'insert',
       dataType: 'json',
       type: 'POST',
       data: comment,
@@ -124,7 +244,8 @@ var Comment = React.createClass({
 });
 
 ReactDOM.render(
-  <CommentBox url="./" />,
+  //  <CommentBox url="./" />,
+  <GijiHolic url="./" />,
   document.getElementById('content')
 );
 

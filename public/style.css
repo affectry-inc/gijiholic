@@ -1,5 +1,85 @@
-div {
+@charset "UTF-8";
+html {
+  height: 100%;
+}
+
+body {
+  font-family: "Open Sans", arial, "游ゴシック", "Yu Gothic", YuGothic, "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+  color: #323b43;
+  background: #f4f7f9;
+  height: 100%;
+  margin: 0;
+}
+
+#content {
+  height: 100%;
+}
+
+.app {
+  height: 100%;
+  padding-top: 20px;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
   box-sizing: border-box;
+}
+
+.g-header {
+  background: #323b43;
+  height: 20px;
+  position: absolute;
+  width: 100%;
+  top: 0;
+  left: 0;
+}
+
+.g-header h1 {
+  margin: 0;
+  font-size: 12px;
+  text-indent: .5em;
+  font-weight: normal;
+}
+
+.g-header h1 a {
+  color: #f4f7f9;
+  text-decoration: none;
+}
+
+.gijiholic-wrapper {
+  height: 100%;
+}
+
+.gijiholic {
+  overflow: hidden;
+  height: 100%;
+}
+
+.editor-wrapper {
+  float: left;
+  width: 50%;
+  height: 100%;
+}
+
+.editor-wrapper textarea {
+  border: 0;
+  width: 100%;
+  height: 100%;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  padding: 1em;
+  outline: none;
+  font-size: 16px;
+}
+
+.preview-wrapper {
+  float: left;
+  width: 50%;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  padding: 1em;
+  height: 100%;
+  overflow: auto;
 }
 
 input {

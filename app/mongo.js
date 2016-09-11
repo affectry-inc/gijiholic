@@ -21,10 +21,10 @@ MongoClient.connect(url, function(err, mongodb) {
  * @param callback コールバック関数
  * http://docs.mongodb.org/manual/reference/method/db.collection.find/
  */
-function find(collection_name, criteria, projection, callback){
+function find(collection_name, criteria, projection, sortation, callback){
   db.collection(collection_name, function(outer_error, collection){
-    collection.find(criteria, projection).toArray(function(inner_error, list){
-    // collection.find(criteria, projection).sort({createdOn: -1}).toArray(function(inner_error, list){
+    // collection.find(criteria, projection).toArray(function(inner_error, list){
+    collection.find(criteria, projection).sort(sortation).toArray(function(inner_error, list){
       callback(list);
     });
   });

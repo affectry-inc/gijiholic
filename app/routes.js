@@ -14,22 +14,36 @@ configRoutes = function(app, server) {
   app.get('/', function(request, response) {
     response.redirect('/index.html');
   });
+  app.get('/findgiji', function(request, response) {
+    mongo.find('giji', {}, {}, {},
+      function(list){
+        response.send(list);
+      }
+    );
+  });
   app.get('/find', function(request, response) {
-    mongo.find('test', {}, {}, 
+    mongo.find('test', {}, {}, {createdOn: -1},
       function(list){
         response.send(list);
       }
     );
   });
   app.get('/find/:name', function(request, response) {
-    mongo.find('test', {createdOn: request.params.name}, {}, 
+    mongo.find('test', {createdOn: request.params.name}, {}, {},
       function(list){
         response.send(list);
       }
     );
   });
 
-  app.post('/insert/:name', function(request, response) {
+  app.post('/insertgiji', function(request, response) {
+    mongo.insert('giji', request.body, {},
+      function(result){
+        response.send(result);
+      }
+    );
+  });
+  app.post('/insert', function(request, response) {
     mongo.insert('test', request.body, {},
       function(result){
         response.send(result);
