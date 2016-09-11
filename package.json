@@ -6,6 +6,10 @@
   "directories": {
     "example": "examples"
   },
+  "engines": {
+    "node": "5.10.X",
+    "npm": "3.8.X"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

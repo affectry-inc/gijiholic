@@ -6,7 +6,7 @@ var db;
 var MongoClient = require('mongodb').MongoClient
 var assert = require('assert');
 
-var url = 'mongodb://localhost:27017';
+var url = process.env.MONGODB_URI || 'mongodb://localhost:27017';
 
 MongoClient.connect(url, function(err, mongodb) {
   assert.equal(null, err);
