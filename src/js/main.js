@@ -42,7 +42,7 @@ var GijiHolic = React.createClass({
 
   handleTitleChange: function(e) {
     this.setState({
-      title: title
+      title: e.target.value
     });
   },
 
