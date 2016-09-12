@@ -14,19 +14,25 @@ marked.setOptions({
 
 var GijiHolic = React.createClass({
   getInitialState: function() {
-    return {data: []};
+    return {
+      title: '',
+      text: ''
+    };
   },
 
   componentWillMount: function() {
-    var initialVal = '# GIJIHolic\n\nis markdown editor';
+    var title = 'Title';
+    var text = '# GIJIHolic\n\nis markdown editor';
     if (localStorage.getItem('giji') === null) {
-      localStorage.setItem('giji', JSON.stringify({text: initialVal}));
+      localStorage.setItem('giji', JSON.stringify({title: title, text: text}));
     }
   },
 
   componentDidMount: function() {
+    data = this.fetchLocal()
     this.setState({
-      data: this.fetchLocal().data
+      title: data.title,
+      text: data.text
     });
   },
 
@@ -34,9 +40,15 @@ var GijiHolic = React.createClass({
     this.saveLocal();
   },
 
+  handleTitleChange: function(e) {
+    this.setState({
+      title: title
+    });
+  },
+
   handleGijiChange: function(e) {
     this.setState({
-      data: {text: e.target.value}
+      text: e.target.value
     });
   },
 
@@ -51,18 +63,21 @@ var GijiHolic = React.createClass({
   render: function() {
     return (
       <div className="app">
-        <Header />
+        <Header
+          title={this.state.title}
+          onChange={this.handleTitleChange}
+        />
         <div className="gijiholic-wrapper">
           <div className="gijiholic">
             <div className="editor-wrapper">
               <GijiEditor
-                text={this.state.data.text}
+                text={this.state.text}
                 onChange={this.handleGijiChange}
               />
             </div>
             <div className="preview-wrapper">
               <GijiPreview
-                text={this.state.data.text}
+                text={this.state.text}
               />
             </div>
           </div>
@@ -73,13 +88,47 @@ var GijiHolic = React.createClass({
 });
 
 var Header = React.createClass({
+  getInitialState: function() {
+    return {title: ''};
+  },
+
+  _onChange(e) {
+    this.props.onChange(e);
+  },
+
   render: function() {
     return (
       <header className="g-header">
         <h1>
           <a href="./">GIJIHolic</a>
         </h1>
+        <div className="title-wrapper">
+          <TitleEditor
+            title={this.props.title}
+            onChange={this._onChange}
+          />
+        </div>
       </header>
+    );
+  }
+});
+
+var TitleEditor = React.createClass({
+  getInitialState: function() {
+    return {title: ''};
+  },
+
+  _onChange(e) {
+    this.props.onChange(e);
+  },
+
+  render: function() {
+    return (
+      <input
+        placeholder='Untitled'
+        value={this.props.title}
+        onChange={this._onChange}
+      />
     );
   }
 });

@@ -1,5 +1,7 @@
 // styles
 
+$header-height: 50px
+
 html
   height: 100%
 body
@@ -14,23 +16,26 @@ body
 
 .app
   height: 100%
-  padding-top: 20px
+  padding-top: $header-height
   -webkit-box-sizing: border-box
   -moz-box-sizing: border-box
   box-sizing: border-box
 
 .g-header
   background: #323b43
-  height: 20px
+  height: $header-height
   position: absolute
   width: 100%
   top: 0
   left: 0
+  padding: 8px
+  box-sizing: border-box
   h1
-    margin: 0
-    font-size: 12px
+    margin: 0 10px
+    font-size: 25px
     text-indent: .5em
     font-weight: normal
+    float: left
     a
       color: #f4f7f9
       text-decoration: none
