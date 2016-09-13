@@ -16,7 +16,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 routes.configRoutes(app);
 
-var server = app.listen(process.env.PORT || 3000, 'localhost', function(err) {
+var server = app.listen(process.env.PORT || 3000, function(err) {
   if (err) {
     console.log(err);
     return;
