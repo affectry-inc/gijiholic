@@ -5,7 +5,7 @@
 var configRoutes;
 var mongo = require('./mongo');
 
-configRoutes = function(app, server) {
+configRoutes = function(app) {
   app.all('/*', function(request, response, next){
     response.contentType('json');
     response.header('Access-Control-Allow-Origin', '*');
