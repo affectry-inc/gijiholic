@@ -31,6 +31,7 @@
     "mongodb": "^2.0.52",
     "react": "^0.14.3",
     "react-dom": "^0.14.3",
+    "split.js": "^1.0.7",
     "vinyl-source-stream": "^1.1.0"
   }
 }

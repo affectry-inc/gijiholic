@@ -4,6 +4,7 @@ var React = require('react');
 var ReactDOM = require('react-dom');
 var $ = require('jquery');
 var marked = require('marked');
+var Split = require('split.js')
 
 marked.setOptions({
   renderer: new marked.Renderer(),
@@ -33,6 +34,10 @@ var GijiHolic = React.createClass({
     this.setState({
       title: data.title,
       text: data.text
+    });
+    Split(['.editor-wrapper', '.preview-wrapper'], {
+      sizes: [50, 50],
+      minSize: 200
     });
   },
 
@@ -69,13 +74,13 @@ var GijiHolic = React.createClass({
         />
         <div className="gijiholic-wrapper">
           <div className="gijiholic">
-            <div className="editor-wrapper">
+            <div className="editor-wrapper split">
               <GijiEditor
                 text={this.state.text}
                 onChange={this.handleGijiChange}
               />
             </div>
-            <div className="preview-wrapper">
+            <div className="preview-wrapper split">
               <GijiPreview
                 text={this.state.text}
               />
@@ -139,7 +144,7 @@ var GijiEditor = React.createClass({
   },
 
   componentDidMount: function() {
-    this.refs.textarea.getDOMNode().focus();
+    this.refs.textarea.focus();
   },
 
   _onChange(e) {
