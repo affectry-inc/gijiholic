@@ -5,6 +5,7 @@ var ReactDOM = require('react-dom');
 var $ = require('jquery');
 var marked = require('marked');
 var Split = require('split.js')
+var Menu = require('react-burger-menu').push
 
 marked.setOptions({
   renderer: new marked.Renderer(),
@@ -68,25 +69,30 @@ var GijiHolic = React.createClass({
   render: function() {
     return (
       <div className="app">
-        <Header
-          title={this.state.title}
-          onChange={this.handleTitleChange}
-        />
-        <div className="gijiholic-wrapper">
-          <div className="gijiholic">
-            <div className="editor-wrapper split">
-              <GijiEditor
-                text={this.state.text}
-                onChange={this.handleGijiChange}
-              />
-            </div>
-            <div className="preview-wrapper split">
-              <GijiPreview
-                text={this.state.text}
-              />
+        <Menu pageWrapId={"page-wrap"}>
+          <a id="home" className="menu-item" href="/">Home</a>
+        </Menu>
+        <main id="page-wrap">
+          <Header
+            title={this.state.title}
+            onChange={this.handleTitleChange}
+          />
+          <div className="gijiholic-wrapper">
+            <div className="gijiholic">
+              <div className="editor-wrapper split">
+                <GijiEditor
+                  text={this.state.text}
+                  onChange={this.handleGijiChange}
+                />
+              </div>
+              <div className="preview-wrapper split">
+                <GijiPreview
+                  text={this.state.text}
+                />
+              </div>
             </div>
           </div>
-        </div>
+        </main>
       </div>
     );
   }

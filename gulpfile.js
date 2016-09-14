@@ -6,18 +6,38 @@ var source = require('vinyl-source-stream');
 var browserify = require('browserify');
 var babelify = require('babelify');
 var browsersync = require('browser-sync');
+var glob = require('glob');
+var cleanCss = require('gulp-clean-css');
+var concat = require('gulp-concat');
+var runSequence = require('run-sequence');
 
 gulp.task('sass', function() {
-  gulp.src('./src/sass/**/*.sass')
+  return gulp.src('./src/sass/**/*.sass')
     .pipe(sass({
       outputStyle: 'expanded'
     }))
+    .pipe(gulp.dest('./tmp'));
+});
+
+gulp.task('concat-css', function() {
+  return gulp.src('./tmp/*.css')
+    .pipe(concat('bundle.css'))
+    .pipe(cleanCss())
     .pipe(gulp.dest('./public'));
 });
 
-gulp.task('concat', function() {
+gulp.task('compile-sass', function(callback) {
+  runSequence(
+    'sass',
+    'concat-css',
+    callback
+  );
+});
+
+gulp.task('compile-js', function() {
+  srcFiles = glob.sync('./src/js/**/*.js');
   browserify({
-    entries: ['./src/js/main.js'],
+    entries: srcFiles,
     debug : !gulp.env.production
   }).transform(babelify, { presets: ["react"] })
     .bundle()
@@ -40,8 +60,8 @@ gulp.task('server', function() {
 
 // Watch
 gulp.task('default', ['server'], function() {
-  gulp.watch("./src/js/**/*.js", ['concat']);
-  gulp.watch("./src/sass/**/*.sass", ['sass']);
+  gulp.watch("./src/js/**/*.js", ['compile-js']);
+  gulp.watch("./src/sass/**/*.sass", ['compile-sass']);
 });
 
 //EADDRINUSEエラーの時プロセスを終了させる
