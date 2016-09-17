@@ -10,9 +10,16 @@ var glob = require('glob');
 var cleanCss = require('gulp-clean-css');
 var concat = require('gulp-concat');
 var runSequence = require('run-sequence');
+var plumber = require('gulp-plumber');
 
 gulp.task('sass', function() {
   return gulp.src('./src/sass/**/*.sass')
+    .pipe(plumber({
+      errorHandler: function(err) {
+        console.log(err.messageFormatted);
+        this.emit('end');
+      }
+    }))
     .pipe(sass({
       outputStyle: 'expanded'
     }))
@@ -41,6 +48,10 @@ gulp.task('compile-js', function() {
     debug : !gulp.env.production
   }).transform(babelify, { presets: ["react"] })
     .bundle()
+    .on('error', function (err) {
+        console.log(err.toString());
+        this.emit("end");
+    })
     .pipe(source('bundle.js'))
     .pipe(gulp.dest("./public"));
 });

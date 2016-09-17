@@ -11,6 +11,9 @@ configRoutes = function(app) {
     response.header('Access-Control-Allow-Origin', '*');
     next();
   });
+  app.get('/404', function(request, response) {
+    response.status(404).send('Not Found');
+  });
   app.get('/', function(request, response) {
     response.redirect('/index.html');
   });

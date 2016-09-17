@@ -32,6 +32,7 @@
     "gulp-concat": "^2.6.0",
     "gulp-live-server": "0.0.29",
     "gulp-load-plugins": "^1.1.0",
+    "gulp-plumber": "^1.1.0",
     "gulp-sass": "^2.3.2",
     "jquery": "^2.1.4",
     "marked": "^0.3.6",
@@ -39,6 +40,7 @@
     "react": "^0.14.3",
     "react-burger-menu": "^1.10.4",
     "react-dom": "^0.14.3",
+    "react-router": "^2.8.1",
     "run-sequence": "^1.2.2",
     "split.js": "^1.0.7",
     "vinyl-source-stream": "^1.1.0"
