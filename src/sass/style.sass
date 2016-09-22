@@ -2,6 +2,9 @@
 
 $header-height: 50px
 
+.hide
+  display: none;
+
 html
   height: 100%
 body
@@ -16,10 +19,13 @@ body
 
 .app
   height: 100%
-  padding-top: $header-height
+  // padding-top: $header-height
   -webkit-box-sizing: border-box
   -moz-box-sizing: border-box
   box-sizing: border-box
+
+#page-wrap
+  height: 100%
 
 .g-header
   background: #323b43
@@ -42,7 +48,8 @@ body
       text-decoration: none
 
 .gijiholic-wrapper
-  height: 100%
+  padding-top: $header-height
+  height: calc(100% - #{$header-height})
 
 .gijiholic
   overflow: hidden

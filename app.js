@@ -10,9 +10,11 @@ var parser = require('body-parser');
 
 var app = express();
 
+const root = path.join(__dirname, 'public');
+
 app.use(parser.urlencoded({extended: true}));
 app.use(parser.json());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(root));
 
 routes.configRoutes(app);
 

@@ -4,7 +4,19 @@ var React = require('react');
 var ReactDOM = require('react-dom');
 var $ = require('jquery');
 var marked = require('marked');
-var Split = require('split.js')
+var Split = require('split.js');
+var Menu = require('react-burger-menu').push;
+var Router = require('react-router').Router;
+var Route = require('react-router').Route;
+var Link = require('react-router').Link;
+var hashHistory = require('react-router').hashHistory;
+var browserHistory = require('react-router').browserHistory;
+
+const actionEdit = 'edit';
+const actionView = 'view';
+const actionDelete = 'delete';
+
+var halfWidth = 0;
 
 marked.setOptions({
   renderer: new marked.Renderer(),
@@ -16,33 +28,85 @@ marked.setOptions({
 var GijiHolic = React.createClass({
   getInitialState: function() {
     return {
+      isDocListMenuOpen: false,
+      code: '',
       title: '',
       text: ''
     };
   },
 
   componentWillMount: function() {
-    var title = 'Title';
-    var text = '# GIJIHolic\n\nis markdown editor';
-    if (localStorage.getItem('giji') === null) {
-      localStorage.setItem('giji', JSON.stringify({title: title, text: text}));
+    if (this.fetchList() === null) {
+      localStorage.setItem('doc.list', JSON.stringify([]));
     }
   },
 
   componentDidMount: function() {
-    data = this.fetchLocal()
-    this.setState({
-      title: data.title,
-      text: data.text
-    });
+    if (this.props.params.action == actionDelete) {
+      this.removeDocLocal(this.props.params.code);
+      this.fetchLocal();
+    } else {
+      this.fetchLocal(this.props.params.code);
+    }
     Split(['.editor-wrapper', '.preview-wrapper'], {
       sizes: [50, 50],
       minSize: 200
     });
+    halfWidth = $(".preview-wrapper").width();
+    this.toggleGutter(this.props.params.action);
   },
 
   componentDidUpdate: function(prevProps, prevState) {
     this.saveLocal();
+  },
+
+  componentWillReceiveProps(props) {
+    if (props.params.action == actionDelete) {
+      this.removeDocLocal(props.params.code);
+      this.fetchLocal();
+    } else {
+      this.fetchLocal(props.params.code);
+    }
+    this.toggleGutter(props.params.action);
+    this.setState({
+      isDocListMenuOpen: false
+    });
+  },
+
+  toggleGutter(action, split = true) {
+    $(".editor-wrapper").removeClass("hide");
+    $(".gutter").removeClass("hide");
+    $(".preview-wrapper").removeClass("hide");
+    if (action == actionView) {
+      $(".editor-wrapper").addClass("hide");
+      $(".gutter").addClass("hide");
+      $(".preview-wrapper").width("100%");
+    } else {
+      if (split) {
+        $(".editor-wrapper").width(halfWidth);
+        $(".preview-wrapper").width(halfWidth);
+      } else {
+        $(".gutter").addClass("hide");
+        $(".preview-wrapper").addClass("hide");
+        $(".editor-wrapper").width("100%");
+      }
+    }
+  },
+
+  toggleFullEditor() {
+    this.toggleGutter(actionEdit, false);
+  },
+
+  handleMenuOpen: function(e) {
+    this.setState({
+      isDocListMenuOpen: true
+    });
+  },
+
+  handleMenuClose() {
+    this.setState({
+      isDocListMenuOpen: false
+    });
   },
 
   handleTitleChange: function(e) {
@@ -57,37 +121,176 @@ var GijiHolic = React.createClass({
     });
   },
 
-  saveLocal: function() {
-    localStorage.setItem('giji', JSON.stringify(this.state));
+  /**
+   * new data -> localStorage
+   */
+  createDocLocal(title, text) {
+    var code = new Date().getTime().toString(16).toUpperCase()
+                 + Math.floor(1000*Math.random()).toString(16).toUpperCase();
+    list = this.fetchList();
+    list.push(code);
+    localStorage.setItem('doc.list', JSON.stringify(list));
+    localStorage.setItem('doc.' + code + '.title', title);
+    localStorage.setItem('doc.' + code + '.text', text);
+    return code;
   },
 
-  fetchLocal: function() {
-    return JSON.parse(localStorage.getItem('giji'));
+  /**
+   * remove data from localStorage
+   */
+  removeDocLocal(code) {
+    list = this.fetchList();
+    list = list.filter(function(e){
+      return e != code;
+    });
+    localStorage.setItem('doc.list', JSON.stringify(list));
+    localStorage.removeItem('doc.' + code + '.title');
+    localStorage.removeItem('doc.' + code + '.text');
+  },
+
+  /**
+   * this.state -> localStorage
+   */
+  saveLocal: function() {
+    localStorage.setItem('doc.' + this.state.code + '.title', this.state.title);
+    localStorage.setItem('doc.' + this.state.code + '.text', this.state.text);
+  },
+
+  /**
+   * localStorade -> this.state
+   */
+  fetchLocal: function(_code) {
+    var code = _code;
+    var list = this.fetchList();
+    if (!code) {
+      if (list.length == 0) {
+        var title = 'Hello~!';
+        var text = '# Welcome to GIJIHolic!\n\n### GIJIHolic is a markdown editor';
+        code = this.createDocLocal(title, text);
+      } else {
+        code = list[0];
+      }
+    } else if (code == 'new') {
+      var text = '\n\n\n\n> Written with [GIJIHolic](https://gijiholic.herokuapp.com).';
+      code = this.createDocLocal('', text);
+      location.href = '#/' + actionEdit + '/' + code;
+    } else if ((list.indexOf(code) < 0)) {
+      location.href = '/404';
+    }
+    this.setState({
+      code: code,
+      title: localStorage.getItem('doc.' + code + '.title'),
+      text: localStorage.getItem('doc.' + code + '.text')
+    });
+  },
+
+  fetchList() {
+    return JSON.parse(localStorage.getItem('doc.list'));
   },
 
   render: function() {
     return (
       <div className="app">
-        <Header
-          title={this.state.title}
-          onChange={this.handleTitleChange}
+        <DocListMenu
+          isOpen={this.state.isDocListMenuOpen}
+          onMenuClose={this.handleMenuClose}
         />
-        <div className="gijiholic-wrapper">
-          <div className="gijiholic">
-            <div className="editor-wrapper split">
-              <GijiEditor
-                text={this.state.text}
-                onChange={this.handleGijiChange}
+        <main id="page-wrap">
+          <Header
+            title={this.state.title}
+            code={this.state.code}
+            onTitleChange={this.handleTitleChange}
+            onMenuClick={this.handleMenuOpen}
+          />
+          <div className="gijiholic-wrapper">
+            <div className="gijiholic">
+              <div className="editor-wrapper split">
+                <GijiEditor
+                  text={this.state.text}
+                  onChange={this.handleGijiChange}
+                />
+              </div>
+              <input type="button" value=">"
+                onClick={this.toggleFullEditor}
+                style={{position: "absolute", top: "50%", height: "50px", backgroundColor: "#eee"}}
               />
-            </div>
-            <div className="preview-wrapper split">
-              <GijiPreview
-                text={this.state.text}
-              />
+              <div className="preview-wrapper split">
+                <GijiPreview
+                  text={this.state.text}
+                />
+              </div>
             </div>
           </div>
-        </div>
+        </main>
       </div>
+    );
+  }
+});
+
+var DocListMenu = React.createClass({
+  getInitialState: function() {
+    return {
+      codeList: []
+    };
+  },
+
+  getDefaultProps: function() {
+    return {
+      pageWrapId: 'page-wrap',
+      customCrossIcon: false,
+      customBurgerIcon: false,
+      isOpen: false
+    };
+  },
+
+  _onStateChange: function(state) {
+    if (state.isOpen) {
+      this.setState({
+        codeList: JSON.parse(localStorage.getItem('doc.list'))
+      });
+    } else {
+      this.props.onMenuClose();
+    }
+  },
+
+  render: function() {
+    return (
+      <Menu
+        pageWrapId={this.props.pageWrapId}
+        customBurgerIcon={this.props.customBurgerIcon}
+        customCrossIcon={this.props.customCrossIcon}
+        isOpen={this.props.isOpen}
+        onStateChange={this._onStateChange}>
+          <DocList codeList={this.state.codeList} />
+      </Menu>
+    );
+  }
+});
+
+var MenuList = React.createClass({
+  render: function() {
+    return (
+      <ul>
+      </ul>
+    );
+  }
+});
+
+var DocList = React.createClass({
+  render: function() {
+    var docNodes = this.props.codeList.map(function(code) {
+      var title = localStorage.getItem('doc.' + code + '.title');
+      if (!title) {title = 'Untitled'}
+      return (
+        <li key={code}>
+          <Link to={'/'+actionEdit+'/'+code}>{title}</Link><br/>
+        </li>
+      );
+    });
+    return (
+      <ul className="docList">
+        {docNodes}
+      </ul>
     );
   }
 });
@@ -97,8 +300,12 @@ var Header = React.createClass({
     return {title: ''};
   },
 
-  _onChange(e) {
-    this.props.onChange(e);
+  _onTitleChange(e) {
+    this.props.onTitleChange(e);
+  },
+
+  _onMenuClick(e) {
+    this.props.onMenuClick(e);
   },
 
   render: function() {
@@ -110,8 +317,13 @@ var Header = React.createClass({
         <div className="title-wrapper">
           <TitleEditor
             title={this.props.title}
-            onChange={this._onChange}
+            onChange={this._onTitleChange}
           />
+          <input type="button" value="GIJIs" onClick={this._onMenuClick} />
+          <Link to={"/"+actionEdit+"/new"}>New Giji</Link>&nbsp;
+          <Link to={"/"+actionEdit+"/"+this.props.code}>Edit</Link>&nbsp;
+          <Link to={"/"+actionView+"/"+this.props.code}>View</Link>&nbsp;
+          <Link to={"/"+actionDelete+"/"+this.props.code}>Delete</Link>
         </div>
       </header>
     );
@@ -177,6 +389,7 @@ var GijiPreview = React.createClass({
     );
   }
 });
+
 
 var CommentBox = React.createClass({
   loadCommentsFromServer: function() {
@@ -299,7 +512,12 @@ var Comment = React.createClass({
 
 ReactDOM.render(
   //  <CommentBox url="./" />,
-  <GijiHolic url="./" />,
-  document.getElementById('content')
+  // <GijiHolic url="./" />,
+  (
+    <Router history={hashHistory}>
+      <Route path="/" component={GijiHolic} />
+      <Route path={"/:action/:code"} component={GijiHolic} />
+    </Router>
+  ), document.getElementById('content')
 );
 
