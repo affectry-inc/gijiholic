@@ -46,7 +46,7 @@ var GijiHolic = React.createClass({
   componentDidMount: function() {
     if (this.props.params.action == actionDelete) {
       this.removeDocLocal(this.props.params.code);
-      this.fetchLocal();
+      location.href = '#';
     } else {
       this.fetchLocal(this.props.params.code);
     }
@@ -62,7 +62,7 @@ var GijiHolic = React.createClass({
   componentWillReceiveProps(props) {
     if (props.params.action == actionDelete) {
       this.removeDocLocal(props.params.code);
-      this.fetchLocal();
+      location.href = '#';
     } else {
       this.fetchLocal(props.params.code);
     }
