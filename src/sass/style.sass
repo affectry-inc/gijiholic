@@ -72,12 +72,24 @@ body
 
 .preview-wrapper
   float: left
-  padding: 1em
+  padding: 1em 1em 1em 1.8em
   height: 100%
   overflow: auto
   .preview-content
     word-wrap: break-word
 
+.toggle-btn
+  position: absolute
+  top: 50%
+  height: 50px
+  width: 30px
+  color: rgba(95,95,95,0.8)
+  background-color: rgba(238,238,238,0.8)
+  cursor: pointer
+  &.offset-left
+    transform: translateX(-25px)
+  &.offset-right
+    transform: translateX(5px)
 
 .gutter
   background-color: #eee
@@ -85,7 +97,6 @@ body
   background-position: 50%
 
 .gutter.gutter-horizontal
-  background-image: url('img/grip_vertical.png')
   cursor: ew-resize
 
 .split, .gutter.gutter-horizontal

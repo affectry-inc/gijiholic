@@ -75,6 +75,8 @@ var GijiHolic = React.createClass({
     $(".editor-wrapper").removeClass("hide");
     $(".gutter").removeClass("hide");
     $(".preview-wrapper").removeClass("hide");
+    $("#split-editor-toggle").addClass("hide");
+    $("#full-editor-toggle").addClass("hide");
     if (action == actionView) {
       $(".editor-wrapper").addClass("hide");
       $(".gutter").addClass("hide");
@@ -83,12 +85,18 @@ var GijiHolic = React.createClass({
       if (split) {
         $(".editor-wrapper").width(editorWidth);
         $(".preview-wrapper").width(previewWidth);
+        $("#full-editor-toggle").removeClass("hide");
       } else {
         $(".gutter").addClass("hide");
         $(".preview-wrapper").addClass("hide");
         $(".editor-wrapper").width("100%");
+        $("#split-editor-toggle").removeClass("hide");
       }
     }
+  },
+
+  toggleSplitEditor() {
+    this.toggleGutter(actionEdit, true);
   },
 
   toggleFullEditor() {
@@ -154,6 +162,7 @@ var GijiHolic = React.createClass({
    * this.state -> localStorage
    */
   saveLocal: function(title, text) {
+    if (this.props.params.action == actionView){ return }
     if (title) {
       localStorage.setItem('doc.' + this.state.code + '.title', title);
     }
@@ -230,9 +239,13 @@ var GijiHolic = React.createClass({
                   onChange={this.handleGijiChange}
                 />
               </div>
-              <input type="button" value=">"
+              <input id="split-editor-toggle" type="button" value="<"
+                className="toggle-btn offset-left"
+                onClick={this.toggleSplitEditor}
+              />
+              <input id="full-editor-toggle" type="button" value=">"
+                className="toggle-btn offset-right"
                 onClick={this.toggleFullEditor}
-                style={{position: "absolute", top: "50%", height: "50px", backgroundColor: "#eee"}}
               />
               <div className="preview-wrapper split">
                 <GijiPreview
