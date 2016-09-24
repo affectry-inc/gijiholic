@@ -32,7 +32,8 @@ var GijiHolic = React.createClass({
       isDocListMenuOpen: false,
       code: '',
       title: '',
-      text: ''
+      text: '',
+      previewScrollRatio: 0
     };
   },
 
@@ -127,6 +128,25 @@ var GijiHolic = React.createClass({
       text: e.target.value
     });
     this.saveLocal(null, e.target.value);
+  },
+
+  handleEditorScroll(e) {
+    var editorScroll = e.target.scrollTop;
+    var editorRange = e.target.scrollHeight - e.target.offsetHeight;
+    var ratio = editorScroll / editorRange;
+    var ele = this.refs.previewWrapper;
+    var previewRange = ele.scrollHeight - ele.offsetHeight;
+    var previewScroll = previewRange * ratio;
+    ele.scrollTop = previewScroll;
+  },
+
+  handlePreviewScroll(e) {
+    // var editorScroll = e.target.scrollTop;
+    // var editorRange = e.target.scrollHeight - e.target.offsetHeight;
+    // var ratio = editorScroll / editorRange;
+    // this.setState({
+    //   previewScrollRatio: ratio
+    // });
   },
 
   /**
@@ -238,7 +258,9 @@ var GijiHolic = React.createClass({
               <div className="editor-wrapper split">
                 <GijiEditor
                   text={this.state.text}
+                  previewScrollRatio={this.state.previewScrollRatio}
                   onChange={this.handleGijiChange}
+                  onScroll={this.handleEditorScroll}
                 />
               </div>
               <input id="split-editor-toggle" type="button" value="<"
@@ -249,7 +271,10 @@ var GijiHolic = React.createClass({
                 className="toggle-btn offset-right"
                 onClick={this.toggleFullEditor}
               />
-              <div className="preview-wrapper split">
+              <div
+                ref="previewWrapper"
+                className="preview-wrapper split"
+                onScroll={this.handlePreviewScroll}>
                 <GijiPreview
                   text={this.state.text}
                 />
@@ -394,8 +419,19 @@ var GijiEditor = React.createClass({
     this.refs.textarea.focus();
   },
 
+  componentWillReceiveProps(props) {
+    var ele = this.refs.textarea;
+    var editorRange = ele.scrollHeight - ele.offsetHeight;
+    var editorScroll = editorRange * props.previewScrollRatio;
+    ele.scrollTop = editorScroll;
+  },
+
   _onChange(e) {
     this.props.onChange(e);
+  },
+
+  _onScroll(e) {
+    this.props.onScroll(e);
   },
 
   render: function() {
@@ -404,6 +440,7 @@ var GijiEditor = React.createClass({
         ref="textarea"
         value={this.props.text}
         onChange={this._onChange}
+        onScroll={this._onScroll}
       />
     );
   }
