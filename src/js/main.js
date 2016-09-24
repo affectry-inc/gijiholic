@@ -16,7 +16,8 @@ const actionEdit = 'edit';
 const actionView = 'view';
 const actionDelete = 'delete';
 
-var halfWidth = 0;
+var editorWidth = 0;
+var previewWidth = 0;
 
 marked.setOptions({
   renderer: new marked.Renderer(),
@@ -52,7 +53,8 @@ var GijiHolic = React.createClass({
       sizes: [50, 50],
       minSize: 200
     });
-    halfWidth = $(".preview-wrapper").width();
+    editorWidth = $(".editor-wrapper").width();
+    previewWidth = $(".preview-wrapper").width();
     this.toggleGutter(this.props.params.action);
   },
 
@@ -79,8 +81,8 @@ var GijiHolic = React.createClass({
       $(".preview-wrapper").width("100%");
     } else {
       if (split) {
-        $(".editor-wrapper").width(halfWidth);
-        $(".preview-wrapper").width(halfWidth);
+        $(".editor-wrapper").width(editorWidth);
+        $(".preview-wrapper").width(previewWidth);
       } else {
         $(".gutter").addClass("hide");
         $(".preview-wrapper").addClass("hide");
