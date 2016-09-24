@@ -173,7 +173,7 @@ var GijiHolic = React.createClass({
   },
 
   /**
-   * localStorade -> this.state
+   * localStorage -> this.state
    */
   fetchLocal: function(_code) {
     var code = _code;
@@ -184,7 +184,8 @@ var GijiHolic = React.createClass({
         var text = '# Welcome to GIJIHolic!\n\n### GIJIHolic is a markdown editor';
         code = this.createDocLocal(title, text);
       } else {
-        code = list[0];
+        var lastOpened = localStorage.getItem('doc.last-opened');
+        code = (lastOpened && list.indexOf(lastOpened) >= 0) ? lastOpened : list[0];
       }
     } else if (code == 'new') {
       code = this.fetchNew();
@@ -196,6 +197,7 @@ var GijiHolic = React.createClass({
     } else if ((list.indexOf(code) < 0)) {
       location.href = '/404';
     }
+    localStorage.setItem('doc.last-opened', code);
     this.setState({
       code: code,
       title: localStorage.getItem('doc.' + code + '.title'),
