@@ -56,10 +56,6 @@ var GijiHolic = React.createClass({
     this.toggleGutter(this.props.params.action);
   },
 
-  componentDidUpdate: function(prevProps, prevState) {
-    this.saveLocal();
-  },
-
   componentWillReceiveProps(props) {
     if (props.params.action == actionDelete) {
       this.removeDocLocal(props.params.code);
@@ -113,12 +109,14 @@ var GijiHolic = React.createClass({
     this.setState({
       title: e.target.value
     });
+    this.saveLocal(e.target.value, null);
   },
 
   handleGijiChange: function(e) {
     this.setState({
       text: e.target.value
     });
+    this.saveLocal(null, e.target.value);
   },
 
   /**
@@ -132,6 +130,7 @@ var GijiHolic = React.createClass({
     localStorage.setItem('doc.list', JSON.stringify(list));
     localStorage.setItem('doc.' + code + '.title', title);
     localStorage.setItem('doc.' + code + '.text', text);
+    localStorage.setItem('doc.' + code + '.new', true);
     return code;
   },
 
@@ -146,14 +145,20 @@ var GijiHolic = React.createClass({
     localStorage.setItem('doc.list', JSON.stringify(list));
     localStorage.removeItem('doc.' + code + '.title');
     localStorage.removeItem('doc.' + code + '.text');
+    localStorage.removeItem('doc.' + code + '.new');
   },
 
   /**
    * this.state -> localStorage
    */
-  saveLocal: function() {
-    localStorage.setItem('doc.' + this.state.code + '.title', this.state.title);
-    localStorage.setItem('doc.' + this.state.code + '.text', this.state.text);
+  saveLocal: function(title, text) {
+    if (title) {
+      localStorage.setItem('doc.' + this.state.code + '.title', title);
+    }
+    if (text) {
+      localStorage.setItem('doc.' + this.state.code + '.text', text);
+    }
+    localStorage.setItem('doc.' + this.state.code + '.new', false);
   },
 
   /**
@@ -171,8 +176,11 @@ var GijiHolic = React.createClass({
         code = list[0];
       }
     } else if (code == 'new') {
-      var text = '\n\n\n\n> Written with [GIJIHolic](https://gijiholic.herokuapp.com).';
-      code = this.createDocLocal('', text);
+      code = this.fetchNew();
+      if (!code) {
+        var text = '\n\n\n\n> Written with [GIJIHolic](https://gijiholic.herokuapp.com).';
+        code = this.createDocLocal('', text);
+      }
       location.href = '#/' + actionEdit + '/' + code;
     } else if ((list.indexOf(code) < 0)) {
       location.href = '/404';
@@ -182,6 +190,16 @@ var GijiHolic = React.createClass({
       title: localStorage.getItem('doc.' + code + '.title'),
       text: localStorage.getItem('doc.' + code + '.text')
     });
+  },
+
+  fetchNew() {
+    list = this.fetchList();
+    for (var i = 0; i < list.length; i++) {
+      if (localStorage.getItem('doc.' + list[i] + '.new') == 'true') {
+        return list[i];
+      }
+    };
+    return null;
   },
 
   fetchList() {
