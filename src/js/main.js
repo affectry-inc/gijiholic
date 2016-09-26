@@ -153,8 +153,12 @@ var GijiHolic = React.createClass({
    * new data -> localStorage
    */
   createDocLocal(title, text) {
-    var code = new Date().getTime().toString(16).toUpperCase()
-                 + Math.floor(1000*Math.random()).toString(16).toUpperCase();
+    var ust = "";
+    for (i = 0; i < 9; i++) {
+      random = Math.random() * 16 | 0;
+      ust += (i == 4 ? (random & 3 | 8) : random).toString(16).toUpperCase();
+    }
+    var code = new Date().getTime().toString(16).toUpperCase() + ust;
     list = this.fetchList();
     list.push(code);
     localStorage.setItem('doc.list', JSON.stringify(list));
